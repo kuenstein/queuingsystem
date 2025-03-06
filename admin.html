@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #000000;
+            color: #1a73e8;
+        }
+        
+        .dashboard-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 10px;
+            border: 10px solid #1a73e8;
+            display: inline-block;
+            background-color: rgb(249, 249, 250);
+        }
+        .counters-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .counter-box {
+            border: 10px solid #1a73e8;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: white;
+            width: 200px;
+            text-align: center;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        .announcement-section {
+            margin-top: 20px;
+            
+        }
+        textarea {
+            width: 60%;
+            height: 50px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a73e8;
+            color: white;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">Admin Dashboard<br>Total Users in Queue: <span id="total-users">0</span></div>
+    <div class="counters-container" id="counters-status"></div>
+    <div class="button-container">
+        <button onclick="exportData()">Export Queue Data</button>
+    </div>
+    <div class="announcement-section">
+        <h2>Announcements</h2>
+        <textarea id="announcement-text" placeholder="Enter your announcement here..."></textarea>
+        <br>
+        <button onclick="publishAnnouncement()">Publish Announcement</button>
+        <div id="announcement-status"></div>
+    </div>
+    <footer>
+        <p>© 2025 HIMS Department. All rights reserved.</p>
+        
+    </footer>
+    <script>
+        async function updateAdminDashboard() {
+            try {
+                const response = await fetch('http://10.0.5.15:3000/queue');
+                const data = await response.json();
+                let countersStatus = '';
+                let totalUsers = 0;
+                for (const service in data) {
+                    const currentNumber = data[service].current ? data[service].current.number : '-';
+                    const waitingNumbers = data[service].waiting.length > 0 ? data[service].waiting.join(', ') : 'None';
+                    const estimatedWaitTime = data[service].estimatedWaitTime || '-';
+                    totalUsers += data[service].waiting.length;
+                    countersStatus += `
+                        <div class="counter-box">
+                            <strong>${service} Counter</strong>
+                            <div>Now Serving: ${currentNumber}</div>
+                            <div>Waiting Numbers: ${waitingNumbers}</div>
+                            
+                        </div>
+                    `;
+                }
+                document.getElementById("counters-status").innerHTML = countersStatus;
+                document.getElementById("total-users").textContent = totalUsers;
+            } catch (error) {
+                console.error("Error updating admin dashboard:", error);
+            }
+        }
+        async function exportData() {
+            const response = await fetch('http://10.0.5.15:3000/export');
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'queue_data.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                alert("Queue data exported successfully.");
+            } else {
+                const errorText = await response.text();
+                alert("Failed to export queue data: " + errorText);
+            }
+        }
+        async function publishAnnouncement() {
+            const announcement = document.getElementById("announcement-text").value;
+            if (!announcement) {
+                alert("Please enter an announcement.");
+                return;
+            }
+            try {
+                const response = await fetch('http://10.0.5.15:3000/announcement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ announcement })
+                });
+                if (response.ok) {
+                    document.getElementById("announcement-status").textContent = "Announcement published successfully.";
+                    document.getElementById("announcement-text").value = "";
+                } else {
+                    alert("Failed to publish announcement.");
+                }
+            } catch (error) {
+                console.error("Error publishing announcement:", error);
+            }
+        }
+        updateAdminDashboard();
+        setInterval(updateAdminDashboard, 2000);
+
+        document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+    </script>
+</body>
+</html>

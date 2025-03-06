@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extraction Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #000000;
+            color: #1a73e8;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a73e8;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a73e8;
+            color: white;
+            margin: 10px;
+        }
+        .current-number {
+            font-size: 100px;
+            font-weight: bold;
+            color: #1a73e8;
+            background: #e8f0fe;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        footer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #000000;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Extraction Counter</h1>
+        <button onclick="callNext()">Call Next</button>
+        <button onclick="recallLastNumber()">Recall Last Number</button>
+        <div>Now Serving:</div>
+        <div class="current-number" id="current-number">-</div>
+    </div>
+    <footer>
+        <p>© 2025 HIMS Department. All rights reserved.</p>
+        
+    </footer>
+    <script>
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            window.speechSynthesis.speak(speech);
+        }
+
+        async function callNext() {
+            try {
+                const response = await fetch('http://10.0.5.15:3000/call', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ service: 'Extraction' })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                if (data.current) {
+                    document.getElementById("current-number").textContent = data.current;
+                    speak(`Now serving number ${data.current}. Please proceed to the Extraction Counter.`);
+                } else {
+                    alert("No more numbers in queue for Extraction.");
+                }
+            } catch (error) {
+                alert("Failed to call next number: " + error.message);
+            }
+        }
+
+        async function recallLastNumber() {
+            try {
+                const response = await fetch('http://10.0.5.15:3000/recall', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ service: 'Extraction' })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                if (data.lastNumber) {
+                    document.getElementById("current-number").textContent = data.lastNumber;
+                    speak(`The last number served was ${data.lastNumber} Please proceed to Extraction Counter.`);
+                } else {
+                    alert("No last number to recall for Extraction.");
+                }
+            } catch (error) {
+                alert("Failed to recall last number: " + error.message);
+            }
+        }
+
+        const socket = new WebSocket('ws://10.0.5.15:8080');
+
+        socket.onmessage = function(event) {
+            const message = event.data;
+            alert(message);
+        };
+        document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+    </script>
+</body>
+</html>

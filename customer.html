@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #000000;
+            color: #1a73e8;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1a73e8;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a73e8;
+            color: white;
+            margin: 10px;
+            width: 100%;
+        }
+        #queueNumber {
+            font-size: 15px;
+            margin-top: 30px;
+            display: none;
+            background-color: #e8f0fe;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        footer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #000000;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Queue System</h1>
+        <p>Select your service:</p>
+        <div id="counters">
+            <button onclick="getQueueNumber('Charging')">Charging</button>
+            <button onclick="getQueueNumber('Releasing')">Releasing of Results</button>
+            <button onclick="getQueueNumber('Extraction')">Extraction</button>
+        </div>
+        <div id="queueNumber"></div>
+        <div class="error" id="error-message"></div>
+    </div>
+    <footer>
+        <p>© 2025 HIMS Department. All rights reserved.</p>
+        
+    </footer>
+    <script>
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            window.speechSynthesis.speak(speech);
+        }
+
+        
+        function printQueueNumber(number, service) {
+    const printWindow = window.open('', '', 'width=600,height=400');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Queue Number</title>
+            <style>
+                body { text-align: center; font-family: Arial, sans-serif; }
+                h1 { font-size: 12px; }
+                h2 { font-size: 140px; color: #1a73e8; margin-top: -20px; }
+                p { font-size: 10px; margin-top: -140px; }
+            </style>
+        </head>
+        <body onload="window.print(); setTimeout(() => window.close(), 1000);">
+            <h1>ACE DUMAGUETE DOCTORS INC.</h1>
+            <h2>${number}</h2>
+            <p>Proceed to <strong>${service}</strong> counter if your number is called.</p>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+
+        function getQueueNumber(service) {
+            document.getElementById("error-message").textContent = ""; // Clear previous error message
+
+            fetch('http://10.0.5.15:3000/queue', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ service })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.number) {
+                    document.getElementById("queueNumber").style.display = 'block';
+                    document.getElementById("queueNumber").innerHTML = `
+                        Your queue number for ${service} is: <strong>${data.number}</strong>
+                    `;
+                    speak(`Your queue number for ${service} is ${data.number}. Please wait to be called.`);
+                    printQueueNumber(data.number, service); // Pass the service to the print function
+                } else {
+                    throw new Error('Could not fetch queue number');
+                }
+            })
+            .catch(error => {
+                document.getElementById("error-message").textContent = "Failed to get queue number: " + error.message;
+            });
+        }
+        document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+    </script>
+</body>
+</html>

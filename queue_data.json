@@ -1,0 +1,126 @@
+{
+  "queues": {
+    "Charging": [
+      {
+        "number": 1,
+        "service": "Charging"
+      },
+      {
+        "number": 4,
+        "service": "Charging"
+      },
+      {
+        "number": 7,
+        "service": "Charging"
+      },
+      {
+        "number": 10,
+        "service": "Charging"
+      },
+      {
+        "number": 13,
+        "service": "Charging"
+      },
+      {
+        "number": 17,
+        "service": "Charging"
+      },
+      {
+        "number": 20,
+        "service": "Charging"
+      },
+      {
+        "number": 21,
+        "service": "Charging"
+      },
+      {
+        "number": 22,
+        "service": "Charging"
+      },
+      {
+        "number": 23,
+        "service": "Charging"
+      },
+      {
+        "number": 24,
+        "service": "Charging"
+      },
+      {
+        "number": 25,
+        "service": "Charging"
+      }
+    ],
+    "Releasing": [
+      {
+        "number": 5,
+        "service": "Releasing"
+      },
+      {
+        "number": 8,
+        "service": "Releasing"
+      },
+      {
+        "number": 11,
+        "service": "Releasing"
+      },
+      {
+        "number": 14,
+        "service": "Releasing"
+      },
+      {
+        "number": 15,
+        "service": "Releasing"
+      },
+      {
+        "number": 18,
+        "service": "Releasing"
+      }
+    ],
+    "Extraction": [
+      {
+        "number": 6,
+        "service": "Extraction"
+      },
+      {
+        "number": 9,
+        "service": "Extraction"
+      },
+      {
+        "number": 12,
+        "service": "Extraction"
+      },
+      {
+        "number": 16,
+        "service": "Extraction"
+      },
+      {
+        "number": 19,
+        "service": "Extraction"
+      }
+    ]
+  },
+  "currentServing": {
+    "Charging": null,
+    "Releasing": {
+      "number": 2,
+      "service": "Releasing"
+    },
+    "Extraction": {
+      "number": 3,
+      "service": "Extraction"
+    }
+  },
+  "lastServed": {
+    "Charging": null,
+    "Releasing": {
+      "number": 2,
+      "service": "Releasing"
+    },
+    "Extraction": {
+      "number": 3,
+      "service": "Extraction"
+    }
+  },
+  "queueNumber": 25,
+  "currentAnnouncement": ""
+}

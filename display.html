@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratory Queue System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: rgb(0, 0, 0);
+            text-align: center;
+            color: #1a73e8;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+        .announcements {
+            font-size: 18px;
+            margin: 20px 0;
+            color: black;
+            background-color: #e8f0fe;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .announcement-text {
+            display: inline-block;
+            animation: scroll 20s linear infinite;
+        }
+        @keyframes scroll {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .counter {
+            padding: 20px;
+            border: 2px solid #1a73e8;
+            border-radius: 5px;
+            background-color: #e8f0fe;
+        }
+        .counter h2 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+        .number {
+            font-size: 250px; /* Increased size for the queued number */
+            font-weight: bold;
+            color: #f80303;
+            animation: flash 1s infinite alternate; /* Flashing effect */
+        }
+        @keyframes flash {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.3;
+            }
+        }
+        footer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #000000;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LABORATORY QUEUE SYSTEM</h1>
+        <div class="announcements">
+            <div class="announcement-text" id="announcement-display">No announcements at this time.</div>
+        </div>
+        <div class="grid" id="counters-status"></div>
+    </div>
+    <footer>
+        <p>© 2025 HIMS Department. All rights reserved.</p>
+        
+    </footer>
+    <script>
+        async function updateDisplay() {
+            try {
+                const response = await fetch('http://10.0.5.15:3000/queue');
+                const data = await response.json();
+                let countersStatus = '';
+
+                for (const service in data) {
+                    const currentNumber = data[service].current ? data[service].current.number : '-';
+                    const waitingNumbers = data[service].waiting.length > 0 ? data[service].waiting.join(', ') : 'None';
+
+                    countersStatus += `
+                        <div class="counter">
+                            <h2>${service.toUpperCase()} COUNTER</h2>
+                            <div class="number">${currentNumber}</div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById("counters-status").innerHTML = countersStatus;
+            } catch (error) {
+                console.error("Error updating display:", error);
+            }
+        }
+
+        async function updateAnnouncement() {
+            try {
+                const response = await fetch('http://10.0.5.15:3000/announcement');
+                const data = await response.json();
+                document.getElementById("announcement-display").textContent = data.announcement || "No announcements at this time.";
+            } catch (error) {
+                console.error("Error fetching announcement:", error);
+            }
+        }
+
+        updateDisplay();
+        updateAnnouncement();
+        setInterval(updateDisplay, 2000);
+        setInterval(updateAnnouncement, 5000);
+        
+        document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+    </script>
+</body>
+</html>

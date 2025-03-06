@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue System Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a73e8;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #1a73e8;
+            color: white;
+            margin: 10px;
+            width: 50%;
+        }
+        footer {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f2f5;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-container">
+        <h1>Login to Dashboard</h1>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="authenticate()">Login</button>
+        <div id="error-message" style="color: red; margin-top: 10px;"></div>
+    </div>
+
+    <div class="container" id="dashboard-container" style="display: none;">
+        <h1>Queue System Dashboard</h1>
+        <p>Select a service:</p>
+        <button onclick="window.location.href='charging.html'">Charging</button>
+        <button onclick="window.location.href='releasing.html'">Releasing of Results</button>
+        <button onclick="window.location.href='extraction.html'">Extraction</button>
+        <button onclick="showAdminLogin()">Admin Dashboard</button>
+    </div>
+
+    <div class="container" id="admin-login-container" style="display: none;">
+        <h1>Admin Login</h1>
+        <input type="text" id="admin-username" placeholder="Admin Username" required>
+        <input type="password" id="admin-password" placeholder="Admin Password" required>
+        <button onclick="authenticateAdmin()">Login</button>
+        <div id="admin-error-message" style="color: red; margin-top: 10px;"></div>
+    </div>
+
+    <footer>
+        <p>© 2025 HIMS Department. All rights reserved.</p>
+        
+    </footer>
+
+    <script>
+        function authenticate() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMessage = document.getElementById("error-message");
+
+            // Replace with your actual username and password
+            const validUsername = "lab";
+            const validPassword = "12345";
+
+            if (username === validUsername && password === validPassword) {
+                document.getElementById("login-container").style.display = 'none';
+                document.getElementById("dashboard-container").style.display = 'block';
+            } else {
+                errorMessage.textContent = "Invalid username or password. Please try again.";
+            }
+        }
+
+        function showAdminLogin() {
+            document.getElementById("dashboard-container").style.display = 'none';
+            document.getElementById("admin-login-container").style.display = 'block';
+        }
+
+        function authenticateAdmin() {
+            const adminUsername = document.getElementById("admin-username").value;
+            const adminPassword = document.getElementById("admin-password").value;
+            const adminErrorMessage = document.getElementById("admin-error-message");
+
+            // Replace with your actual admin username and password
+            const validAdminUsername = "admin";
+            const validAdminPassword = "admin123";
+
+            if (adminUsername === validAdminUsername && adminPassword === validAdminPassword) {
+                window.location.href = 'admin.html'; // Redirect to Admin Dashboard
+            } else {
+                adminErrorMessage.textContent = "Invalid admin username or password. Please try again.";
+            }
+        }
+        document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+    </script>
+</body>
+</html>
